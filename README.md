@@ -56,9 +56,9 @@ Cada petición queda registrada en la terminal: `2026-11-22T15:04:05.123Z  GET /
 |---|---|---|---|
 | id | entero | No: lo asigna MySQL | Positivo y único |
 | codigo | texto | Sí | No vacío, máximo 20 caracteres; **único** (409) |
-| nombre | texto | Sí | No vacío |
+| nombre | texto | Sí | No vacío, máximo 120 caracteres |
 | fecha | texto (fecha) | Sí | Formato `AAAA-MM-DD` y fecha real del calendario |
-| asistentes_esperados | entero | Sí | Mayor que 0 |
+| asistentes_esperados | entero | Sí | Mayor que 0, máximo 2147483647 |
 | tipo | texto | Sí | `conferencia`, `taller` o `feria` |
 
 **Regla de negocio (capa de servicio):** **409** si ya existe otro evento con el mismo `codigo`. Al actualizar, el evento no choca consigo mismo.
@@ -90,7 +90,7 @@ Respuesta `201 Created` (cabecera `Location: /eventos/4`):
 Formato de error: `{ "error": "mensaje", "detalles": ["..."] }` (detalles solo en validación). Ejemplos:
 
 ```json
-{ "error": "Datos inválidos", "detalles": ["asistentes_esperados es obligatorio y debe ser un entero mayor que 0"] }
+{ "error": "Datos inválidos", "detalles": ["asistentes_esperados es obligatorio y debe ser un entero entre 1 y 2147483647"] }
 { "error": "Ya existe un evento con el código EV-001 (evento 1)" }
 { "error": "No existe el evento con id 999" }
 { "error": "Falta el token de acceso (cabecera Authorization: Bearer <token>)" }

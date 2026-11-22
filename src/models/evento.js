@@ -31,14 +31,17 @@ function validarEvento(datos) {
   if (!esTextoNoVacio(datos.codigo) || datos.codigo.trim().length > 20) {
     errores.push('codigo es obligatorio (texto de máximo 20 caracteres)');
   }
-  if (!esTextoNoVacio(datos.nombre)) {
-    errores.push('nombre es obligatorio (texto)');
+  // La columna es VARCHAR(120): un nombre más largo debe dar 400, no 500
+  if (!esTextoNoVacio(datos.nombre) || datos.nombre.trim().length > 120) {
+    errores.push('nombre es obligatorio (texto de máximo 120 caracteres)');
   }
   if (!esFechaValida(datos.fecha)) {
     errores.push('fecha es obligatoria con formato AAAA-MM-DD (ej. 2026-12-03)');
   }
-  if (!Number.isInteger(datos.asistentes_esperados) || datos.asistentes_esperados <= 0) {
-    errores.push('asistentes_esperados es obligatorio y debe ser un entero mayor que 0');
+  // La columna es INT: su valor máximo es 2147483647
+  if (!Number.isInteger(datos.asistentes_esperados) || datos.asistentes_esperados <= 0
+      || datos.asistentes_esperados > 2147483647) {
+    errores.push('asistentes_esperados es obligatorio y debe ser un entero entre 1 y 2147483647');
   }
   if (!TIPOS.includes(datos.tipo)) {
     errores.push(`tipo debe ser uno de: ${TIPOS.join(', ')}`);
