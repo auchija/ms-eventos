@@ -34,10 +34,15 @@ async function obtenerAuditorio(id, token) {
   return respuesta.json();   // { id, nombre_auditorio, sede, aforo }
 }
 
+async function obtenerAuditoriosPorIds(ids, token) {
+  const respuesta = await pedir(`/auditorios?ids=${ids.join(',')}`, token);
+  if (!respuesta || !respuesta.ok) return null;
+  return respuesta.json();
+}
 // Ejemplo de uso:
 //   const respuesta = await pedir('/auditorios/3', token);
 //   if (!respuesta) ...                   → ms-auditorios no respondió
 //   if (respuesta.status === 404) ...     → no existe
 //   const datos = await respuesta.json(); → el objeto (o el arreglo, con ?ids=)
 
-module.exports = { pedir,obtenerAuditorio };
+module.exports = { pedir,obtenerAuditorio, obtenerAuditoriosPorIds };

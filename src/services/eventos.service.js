@@ -24,15 +24,33 @@ function validarAforo(evento, auditorio) {
       `${auditorio.id} - ${auditorio.nombre_auditorio} (${auditorio.aforo})`);
   }
 }
+function resumenAuditorio(a) {
+  return { id: a.id, nombre_auditorio: a.nombre_auditorio, sede: a.sede };
+}
+const AVISO_AUDITORIOS = 'no se pudo obtener el auditorio';
+async function componer(eventos, token) {
+  if (eventos.length === 0) return eventos;
+  const ids = [...new Set(eventos.map((e) => e.auditorio_id))];   // sin repetidos
+  const auditorios = await auditoriosClient.obtenerAuditoriosPorIds(ids, token);
 
-async function listar(filtros) {
-  return repo.findAll(filtros);
+  return eventos.map((evento) => {
+    if (auditorios === null) {
+      return { ...evento, auditorio: null, aviso: AVISO_AUDITORIOS };
+    }
+    const a = auditorios.find((x) => x.id === evento.auditorio_id);
+    return { ...evento, auditorio: a ? resumenAuditorio(a) : null };
+  });
+}
+async function listar(filtros, token) {
+  const eventos = await repo.findAll(filtros);
+  return componer(eventos, token);
 }
 
-async function obtener(id) {
+async function obtener(id, token) {
   const evento = await repo.findById(id);
   if (!evento) throw new HttpError(404, `No existe el evento con id ${id}`);
-  return evento;
+  const [compuesto] = await componer([evento], token);
+  return compuesto;
 }
 
 async function crear(datos, token) {
@@ -43,7 +61,8 @@ async function crear(datos, token) {
   const auditorio = await auditoriosClient.obtenerAuditorio(evento.auditorio_id, token);
   validarAforo(evento, auditorio);
   await validarCodigoUnico(evento.codigo);
-  return repo.create(evento);
+   const nuevo = await repo.create(evento);
+  return { ...nuevo, auditorio: resumenAuditorio(auditorio) };
 }
 
 async function actualizar(id, datos, token) {
@@ -56,7 +75,8 @@ async function actualizar(id, datos, token) {
   const auditorio = await auditoriosClient.obtenerAuditorio(evento.auditorio_id, token);
   validarAforo(evento, auditorio);
   await validarCodigoUnico(evento.codigo, id);
-  return repo.update(id, evento);
+    const actualizado = await repo.update(id, evento);
+  return { ...actualizado, auditorio: resumenAuditorio(auditorio) };
 }
 
 async function eliminar(id) {

@@ -22,12 +22,12 @@ async function listar(req, res) {
     }
     filtros.tipo = req.query.tipo;
   }
-  res.status(200).json(await service.listar(filtros));
+    res.status(200).json(await service.listar(filtros, req.headers.authorization));
 }
 
 // GET /eventos/:id
 async function obtener(req, res) {
-  res.status(200).json(await service.obtener(leerId(req)));
+    res.status(200).json(await service.obtener(leerId(req), req.headers.authorization));
 }
 
 // POST /eventos  ·  201 Created + cabecera Location con la URI del nuevo recurso
