@@ -17,6 +17,13 @@ async function validarCodigoUnico(codigo, excluirId = null) {
     throw new HttpError(409, `Ya existe un evento con el código ${codigo} (evento ${otro.id})`);
   }
 }
+function validarAforo(evento, auditorio) {
+  if (evento.asistentes_esperados > auditorio.aforo) {
+    throw new HttpError(400,
+      `asistentes_esperados (${evento.asistentes_esperados}) supera el aforo del auditorio ` +
+      `${auditorio.id} - ${auditorio.nombre_auditorio} (${auditorio.aforo})`);
+  }
+}
 
 async function listar(filtros) {
   return repo.findAll(filtros);
@@ -34,6 +41,7 @@ async function crear(datos, token) {
 
   const evento = construirEvento(datos);
   const auditorio = await auditoriosClient.obtenerAuditorio(evento.auditorio_id, token);
+  validarAforo(evento, auditorio);
   await validarCodigoUnico(evento.codigo);
   return repo.create(evento);
 }
@@ -46,6 +54,7 @@ async function actualizar(id, datos, token) {
 
   const evento = construirEvento(datos);
   const auditorio = await auditoriosClient.obtenerAuditorio(evento.auditorio_id, token);
+  validarAforo(evento, auditorio);
   await validarCodigoUnico(evento.codigo, id);
   return repo.update(id, evento);
 }
