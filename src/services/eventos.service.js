@@ -7,6 +7,7 @@
 const repo = require('../repositories/eventos.repository');
 const { validarEvento, construirEvento } = require('../models/evento');
 const HttpError = require('../utils/http-error');
+const auditoriosClient = require('../clients/auditorios.client');
 
 // Regla de negocio 409: no puede haber dos eventos con el mismo código.
 // excluirId: al actualizar, el evento no choca consigo mismo.
@@ -27,22 +28,24 @@ async function obtener(id) {
   return evento;
 }
 
-async function crear(datos) {
+async function crear(datos, token) {
   const errores = validarEvento(datos);
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
   const evento = construirEvento(datos);
+  const auditorio = await auditoriosClient.obtenerAuditorio(evento.auditorio_id, token);
   await validarCodigoUnico(evento.codigo);
   return repo.create(evento);
 }
 
-async function actualizar(id, datos) {
+async function actualizar(id, datos, token) {
   const errores = validarEvento(datos);
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
   if (!(await repo.findById(id))) throw new HttpError(404, `No existe el evento con id ${id}`);
 
   const evento = construirEvento(datos);
+  const auditorio = await auditoriosClient.obtenerAuditorio(evento.auditorio_id, token);
   await validarCodigoUnico(evento.codigo, id);
   return repo.update(id, evento);
 }

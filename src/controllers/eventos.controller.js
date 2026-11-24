@@ -32,13 +32,13 @@ async function obtener(req, res) {
 
 // POST /eventos  ·  201 Created + cabecera Location con la URI del nuevo recurso
 async function crear(req, res) {
-  const nuevo = await service.crear(req.body);
+  const nuevo = await service.crear(req.body, req.headers.authorization);
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
 }
 
 // PUT /eventos/:id  ·  reemplaza el evento completo (el cuerpo lleva todos los atributos, sin id)
 async function actualizar(req, res) {
-  res.status(200).json(await service.actualizar(leerId(req), req.body));
+  res.status(200).json(await service.actualizar(leerId(req), req.body, req.headers.authorization));
 }
 
 // DELETE /eventos/:id  ·  204 No Content: éxito, sin cuerpo
