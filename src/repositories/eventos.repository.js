@@ -33,9 +33,9 @@ async function findByCodigo(codigo) {
 
 async function create(evento) {
   const [resultado] = await pool.query(
-    'INSERT INTO eventos (codigo, nombre, fecha, asistentes_esperados, tipo) VALUES (?, ?, ?, ?, ?)',
-    [evento.codigo, evento.nombre, evento.fecha, evento.asistentes_esperados, evento.tipo]);
-  return findById(resultado.insertId);     // MySQL devuelve el id generado
+    'INSERT INTO eventos (codigo, nombre, fecha, asistentes_esperados, tipo, auditorio_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [evento.codigo, evento.nombre, evento.fecha, evento.asistentes_esperados, evento.tipo, evento.auditorio_id]);
+  return findById(resultado.insertId);    
 }
 
 // Reemplaza el evento completo (PUT). Devuelve el evento actualizado o null si no existe.

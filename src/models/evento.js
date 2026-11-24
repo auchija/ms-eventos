@@ -46,6 +46,10 @@ function validarEvento(datos) {
   if (!TIPOS.includes(datos.tipo)) {
     errores.push(`tipo debe ser uno de: ${TIPOS.join(', ')}`);
   }
+  if (!Number.isInteger(datos.auditorio_id) || datos.auditorio_id <= 0
+      || datos.auditorio_id > 2147483647) {
+    errores.push('auditorio_id es obligatorio y debe ser un entero positivo');
+  }
   return errores;
 }
 
@@ -58,6 +62,7 @@ function construirEvento(datos) {
     fecha: datos.fecha,
     asistentes_esperados: datos.asistentes_esperados,
     tipo: datos.tipo,
+    auditorio_id: datos.auditorio_id,
   };
 }
 
