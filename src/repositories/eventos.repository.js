@@ -41,8 +41,8 @@ async function create(evento) {
 // Reemplaza el evento completo (PUT). Devuelve el evento actualizado o null si no existe.
 async function update(id, evento) {
   const [resultado] = await pool.query(
-    'UPDATE eventos SET codigo = ?, nombre = ?, fecha = ?, asistentes_esperados = ?, tipo = ? WHERE id = ?',
-    [evento.codigo, evento.nombre, evento.fecha, evento.asistentes_esperados, evento.tipo, id]);
+    'UPDATE eventos SET codigo = ?, nombre = ?, fecha = ?, asistentes_esperados = ?, tipo = ?, auditorio_id = ? WHERE id = ?',
+    [evento.codigo, evento.nombre, evento.fecha, evento.asistentes_esperados, evento.tipo, evento.auditorio_id, id]);
   if (resultado.affectedRows === 0) return null;
   return findById(id);
 }
